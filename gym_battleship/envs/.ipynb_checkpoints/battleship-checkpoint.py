@@ -99,6 +99,10 @@ class BattleshipEnv(gym.Env):
   
     def render(self, mode='human'):
         return NotImplemented
+    
+    def reset(self):
+        self.state = 0
+        return self.state
 
 
 

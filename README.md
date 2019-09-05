@@ -1,29 +1,35 @@
 # gym-battleship
-OpenAI Gym environment for console based Battleship
+
+gym-battleship is a texted-basd gym environment for the classic game of Battleship. It was designed to allow the development of optimal strategic agents, and to develop agents in an adversial environment.
 
 
-    Three possible game modes
-    
-      Single or Two Player
-        Single Player:
-          Goal is to destroy enemy ships in as few moves as possible.
-          Forces Random Ship Placement
-          
-          Used for designing optimal firing strategies 
-          
-        Two Player:
-          Goal is to destroy all enemy ships before the enemy destroys yours
-          Either Random or Stragetic Ship Placement
-          
-          Used for comparing firing strategies
-          Used for determnining optimal ship placement
-          
-      Random or Strategic Ship Placement:
-        Random:
-          Ships are placed randomly throughout grid
-          
-        Strategic:
-          Ship placement determined by agent
+## Game Modes
+
+### Single Player
+
+Single player mode allows the creation of optimal firing agents. This mode randomly positions an opponents ships, then allows for the agent to take consecutive shots until all ships have been sunk.
+
+Since it is impossible to react to an opponent firing on your ship, the goal of the game becomes to sink all the opponents ships before they sink yours. Therefore, the goal is to minimize the number of shots required to sink all the opponents ships.
+
+
+### Two Player
+
+Two player mode allows two agents to play against eachother.
+
+
+
+## Technical Details
+
+### Action Space
+
+### Observation Space
+
+### Reward
+
+### Game Parameters
+
+
+
 
 
     Four boards:
