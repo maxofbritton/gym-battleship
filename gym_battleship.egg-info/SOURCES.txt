@@ -1,0 +1,7 @@
+README.md
+setup.py
+gym_battleship.egg-info/PKG-INFO
+gym_battleship.egg-info/SOURCES.txt
+gym_battleship.egg-info/dependency_links.txt
+gym_battleship.egg-info/requires.txt
+gym_battleship.egg-info/top_level.txt
