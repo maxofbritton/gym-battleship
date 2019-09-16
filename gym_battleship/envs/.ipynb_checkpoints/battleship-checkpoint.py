@@ -10,25 +10,37 @@ class BattleshipEnv(gym.Env):
         'game.modes': ['single', 'two']
     }
     
-    def __init__(self, board_size=(10,10)):
+    def __init__(self, game_mode='single', board_size=(10,10), ships=None, ship_placement=None, seed=None):
         
-        fleet = [Ship('AircraftCarrier',5),
-                      Ship('Battleship',4),
-                      Ship('Submarine',3),
-                      Ship('Cruiser',3),
-                      Ship('Destroyer',2)]
+        assert type(ships) is list, "%r (%s) invalid, must be list"%(ships, type(ships))
+        if ships:
+            fleet = []
+            for ship in ships:
+                fleet.append(Ship(ship[0],ship[1]))
+        else:
+            fleet = [Ship('AircraftCarrier',5),
+                          Ship('Battleship',4),
+                          Ship('Submarine',3),
+                          Ship('Cruiser',3),
+                          Ship('Destroyer',2)]
         
-        self.game_mode = 'single'
+        assert game_mode in self.metadata['game.modes'], "%r (%s) invalid, must be one of %"%(game_mode, type(game_mode), self.metadata['game.modes'])
+        self.game_mode = game_mode
         
         # Create a seed so we can replicate the random placement of ships
         self.np_random, self.seed = seeding.np_random()
         
-        # Set who's turn it is
-        self.player_turn = 0
+        assert type(seed) is int, "%r (%s) invalid, must be int"%(seed, type(seed))
+        if seed:
+            self.seed = seed
+        
         
         # Create the game board
         n_players = 1 if self.game_mode == 'single' else 2
-        self.board = Board(n_players, board_size, fleet, self.seed)
+        self.board = Board(n_players, board_size, fleet, self.seed, ship_placement)
+        
+        # Set who's turn it is
+        self.player_turn = 0
         
         # One action, to select a single position on the board
         # board is 'numbered' left to right, top to bottom
@@ -98,6 +110,7 @@ class BattleshipEnv(gym.Env):
     
   
     def render(self, mode='human'):
+        # TO-DO - implement rendering for console
         return NotImplemented
     
     def reset(self):
@@ -121,7 +134,7 @@ class Ship():
     
 class Board():
     
-    def __init__(self, n_players, shape, fleet, seed, ships=None):
+    def __init__(self, n_players, shape, fleet, seed, ship_placement):
         
         self.shape = shape
         self.fleet = fleet
@@ -130,13 +143,24 @@ class Board():
         # When ships are set, they are set to the opponents ID
         # E.g. player A sets ships at index 1
         self.shots = [np.zeros(self.shape) for i in range(n_players)]
-
+        
+        assert len(ship_placement) == n_players, "ship_placement (%i) invalid, must be equal to n_players %i"%(len(ship_placement), n_players)
+        
+        assert type(ship_placement[0]) is np.array, "ship_placement (%s) invalid, must be np.array"%(type(ship_placement))
+        assert ship_placement[0].shape == self.shape, "ship_placement (%) invalid, must be shape %"%(ship_placement[0].shape,self.shape)
+        
+        
         # place the ships
         if n_players == 1:
-            self.ships = (self.place_ships(seed), None)
+            self.ships = (ship_placement[0], None) if ship_placement[0] else (self.place_ships(seed), None)
         
         elif n_players == 2:
-            self.ships = (self.place_ships(seed), self.place_ships(seed))
+            assert type(ship_placement[1]) is np.array, "ship_placement (%s) invalid, must be np.array"%(type(ship_placement))
+            assert ship_placement[1].shape == self.shape, "ship_placement (%) invalid, must be shape %"%(ship_placement[0].shape,self.shape)
+            self.ships = (ship_placement[0], ship_placement[1]) if ship_placement[0] else (self.place_ships(seed), self.place_ships(seed))
+            
+        
+        # TO-DO - double check that the ship_placement has all the ships at correct lengths
         
         return
     
@@ -162,7 +186,9 @@ class Board():
         
         """
         
-        # TO-DO - make the seed actually do something
+        # TO-DO - Make the seed actually do something
+        # TO-DO - Add a method to exit if can't place ship
+        # TO-DO - Methodically check all possible positions available, then use seed to select position
         
         ships = np.zeros(self.shape)
         ship_id = 1
